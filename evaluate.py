@@ -11,9 +11,13 @@ def plot_residuals(y, yhat):
 
     #sns.scatterplot(data=train_scaled, x=single_var,y=y)
 
-    sns.scatterplot(x=y,y=residual,color="red",label="residual of regression")
+    sns.scatterplot(x=y, 
+                    y=residual, 
+                    color="red", 
+                    label="residual of regression")
     plt.axhline(y=0)
     plt.legend()
+    plt.ylabel("yhat - y")
     plt.title("scatter plot of residual of regression")
     plt.show()
 
@@ -102,4 +106,4 @@ def better_than_baseline(y, yhat):
         flag = False
         print("model performed worse than baseline on RMSE")
 
-    return
+    return flag
