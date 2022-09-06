@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 # Generic splitting function for continuous target.
 
-def split_continuous(df):
+def split_tvt_continuous(df,target):
     """
     Takes in a df
     Returns train, validate, and test DataFrames
@@ -15,25 +15,6 @@ def split_continuous(df):
     # Create train_validate and test datasets
     train_validate, test = train_test_split(df, test_size=0.2, random_state=123)
     # Create train and validate datsets
-    train, validate = train_test_split(train_validate, test_size=0.25, random_state=123)
-
-    # Take a look at your split datasets
-
-    print(f"train -> {train.shape}")
-    print(f"validate -> {validate.shape}")
-    print(f"test -> {test.shape}")
-    return train, validate, test
-
-
-def train_validate_test(df, target):
-    """
-    takes in a dataframe, splits it into 60, 20, 20, 
-    and seperates out the x variables and y (target) as new df/series
-    """
-    # split df into test (20%) and train_validate (80%)
-    train_validate, test = train_test_split(df, test_size=0.2, random_state=123)
-
-    # split train_validate off into train (70% of 80% = 56%) and validate (30% of 80% = 24%)
     train, validate = train_test_split(train_validate, test_size=0.25, random_state=123)
 
     # split train into X (dataframe, drop target) & y (series, keep target only)
@@ -52,7 +33,37 @@ def train_validate_test(df, target):
     print(f"validate -> {validate.shape}")
     print(f"test -> {test.shape}")
 
-    return X_train, y_train, X_validate, y_validate, X_test, y_test
+    return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test
+
+
+def split_tvt_stratify(df, target):
+    """
+    takes in a dataframe, splits it into 60, 20, 20, 
+    and seperates out the x variables and y (target) as new df/series
+    """
+    # split df into test (20%) and train_validate (80%)
+    train_validate, test = train_test_split(df, test_size=0.2, random_state=123,stratify = train[target])
+
+    # split train_validate off into train (70% of 80% = 56%) and validate (30% of 80% = 24%)
+    train, validate = train_test_split(train_validate, test_size=0.25, random_state=123,stratify = train[target])
+
+    # split train into X (dataframe, drop target) & y (series, keep target only)
+    X_train = train.drop(columns=[target])
+    y_train = train[target]
+
+    # split validate into X (dataframe, drop target) & y (series, keep target only)
+    X_validate = validate.drop(columns=[target])
+    y_validate = validate[target]
+
+    # split test into X (dataframe, drop target) & y (series, keep target only)
+    X_test = test.drop(columns=[target])
+    y_test = test[target]
+
+    print(f"train -> {train.shape}")
+    print(f"validate -> {validate.shape}")
+    print(f"test -> {test.shape}")
+
+    return X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test
 
 
 
@@ -129,8 +140,8 @@ def wrangle_example(path):
     df = create_dummies(df, object_cols)
 
     # split data
-    X_train, y_train, X_validate, y_validate, X_test, y_test = train_validate_test(
-        df, "G3"
+    X_train, y_train, X_validate, y_validate, X_test, y_test, train, validate, test= split_tvt_stratify(
+        df, "target"
     )
 
     # get numeric column names
