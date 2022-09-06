@@ -3,6 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def plot_residuals(y, yhat):
     ''' 
     takes in a target column and the predicted/modeled regression col based on the targets column and creates a residual plot
@@ -89,21 +90,21 @@ def better_than_baseline(y, yhat):
 
     flag = True
     if SSE < SSE_baseline:
-        print("model performed better than baseline on SSE")
+        print("OSL model performed better than baseline on SSE")
     else:
         flag = False
-        print("model performed worse than baseline on SSE")
+        print("OSL model performed worse than baseline on SSE")
 
     if MSE < MSE_baseline:
-        print("model performed better than baseline on MSE")
+        print("OSL model performed better than baseline on MSE")
     else:
         flag = False
-        print("model performed worse than baseline on MSE")
+        print("OSL model performed worse than baseline on MSE")
 
     if RMSE < RMSE_baseline:
-        print("model performed better than baseline on RMSE")
+        print("OSL model performed better than baseline on RMSE")
     else:
         flag = False
-        print("model performed worse than baseline on RMSE")
+        print("OSL model performed worse than baseline on RMSE")
 
     return flag
