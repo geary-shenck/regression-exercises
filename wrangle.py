@@ -124,7 +124,30 @@ def get_object_cols(df):
 
     return object_cols
 
+def wrangle_zillow(df,outlier_list):
+    ''' 
+    gets info from prepare
+    removes outliers of numerical columns through the tukey method (k=1.5)
+    drops the bathroom labeld as 1.75 (i'm not aware of that being an official measurement)
+    adds column that categorizes years into decades
+    splits into 60%,20%,20%
+    returns the the modified dataframe, and the splits dataframe
+    '''
 
+    tukey_k = 1.5
+
+    for col in outlier_list:
+       IQR = (df[col].describe()["75%"] - df[col].describe()["25%"])
+       df = df[(df[col] < (df[col].describe()["75%"] + (IQR * tukey_k))) & \
+            (df[col] > (df[col].describe()["25%"] - (IQR * tukey_k)))]
+
+    df = df[df.bathrooms != 1.75]
+
+    df["decade built"] = (df["year built"]//10 *10).astype(int).astype(str) + "s"
+
+    train, test, validate = prepare.split_continous(df)
+
+    return df,train,validate,test
 
 
 def wrangle_example(path):
