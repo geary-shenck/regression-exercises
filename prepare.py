@@ -42,50 +42,37 @@ def split_continous(df):
 
 def prep_zillow(df0):
     ''' 
-    no arguements
-    gets - acquires zillow data with lesson guided restrictions (for features)
+    input the dataframe from the aquire.get_zillow_sing_fam
     replaces any whitespace with nans
     renames featues
-    drops nans (large enough data set)
     returns the prepared dataframe
     '''
 # get the data and review the data
 
     #df0 = acquire.get_zillow_single_fam()
-    ## datatypes look good with 2,152,863 records
+    ## datatypes look good
 
     ## start the clean up
     ## remove cells with whitespace and replace with NaN in a new working dataframe
+    ## rename to use more common terminology/legibility
 
     df = df0.replace(r'^\s*$', np.nan, regex=True)
+
+    df.fips = np.where(df.fips == 6059,"Orange Cnty", 
+                        np.where(df.fips == 6111,"Ventura Cnty", "Los Angeles Cnty"))
+
     df = df.rename(columns = {"bedroomcnt":"bedrooms",
                                 "bathroomcnt":"bathrooms",
                             "calculatedfinishedsquarefeet":"area",
-                            "taxvaluedollarcnt":"tax value",
-                            "taxamount":"taxes yearly",
+                            "taxvaluedollarcnt":"tax assessment",
+                            "lotsizesquarefeet":"lot sqft",
+                            "regionidzip":"zip",
                             "yearbuilt":"year built"
                             })
 
+    df.zip = df[df.zip > 0]["zip"].astype(int).astype(object)
 
-    ## drop n/a and review
-    df = df.dropna()
-
-    ##ranges on these look very crazy, diving deeper
-    #for col in df.columns:
-    #    print("range of",col, ": {:,}".format((df[col].describe()["max"] - df[col].describe()["min"]).astype(int)), "({:,}".format(df[col].describe()["max"]), "max - min {:,})".format(df[col].describe()["min"]))
-
+  
     return df
 
 
-def minmaxscaler(train,validate,test,target_cols):
-    ''' 
-    takes in train,validate,test, and list for targeting
-    scales target cols for set
-    '''
-
-    scaler = MinMaxScaler()
-
-    train[target_cols] = scaler.fit_transform(train[target_cols]) ##only use fit_transform for training, after that use transform (equations are created)
-    validate[target_cols] = scaler.transform(validate[target_cols])
-    test[target_cols] = scaler.transform(test[target_cols])
-    return train,validate,test
